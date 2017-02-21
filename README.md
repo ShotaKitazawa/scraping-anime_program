@@ -9,6 +9,8 @@ https://akiba-souken.com/anime/[spring|summer|autumn|winter]/ からスクレイ
 	- beautifulsoup4 (4.5.3)
 	- requests (2.13.0)
 	- tweepy (3.5.0)
+	- mysqlclient (1.3.10)
+- MariaDB 10.1.21
 
 # Problem
 
@@ -82,6 +84,20 @@ CONSUMER_KEY = hoge
 CONSUMER_SECRET = hoge
 ACCESS_TOKEN = hoge
 ACCESS_TOKEN_SECRET = hoge
+
+import MySQLdb
+CONNECTION = MySQLdb.connect(
+    user = hoge,
+    passwd = hoge,
+    host = hoge,
+    db = hoge,
+)
 ```
 
 - broadcaster.py には、検索したい放送局名をリストに入れる。
+
+- anime_db.sql の使い方
+
+```bash
+mysql -p -u (DBユーザ名) (DB名) < anime_db.sql
+```

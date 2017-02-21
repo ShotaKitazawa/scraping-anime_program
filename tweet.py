@@ -120,7 +120,7 @@ def japanese(season):
         return "秋"
     elif season == "winter":
         return "冬"
-    return "N/A"
+    return "_"
 
 
 if __name__ == "__main__":

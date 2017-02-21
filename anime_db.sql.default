@@ -1,3 +1,5 @@
+# TODO: 外部キー、インデックスの使い方がわからない
+
 drop table if exists anime;
 drop table if exists brand;
 drop table if exists actor;
@@ -21,27 +23,33 @@ create table anime(
 );
 create table brand(
 	brand_id int(6), name varchar(20), 
-	PRIMARY KEY(brand_id)
+	PRIMARY KEY(brand_id), 
+	FOREIGN KEY(brand_id) REFERENCES anime(brand_id)
 );
 create table actor(
 	actor_id int(6), name varchar(20), 
-	PRIMARY KEY(actor_id)
+	PRIMARY KEY(actor_id), 
+	FOREIGN KEY(actor_id) REFERENCES anime(actor_id)
 ); 
 create table originwriter(
 	writer_id int(6), name varchar(20), 
-	PRIMARY KEY(writer_id)
+	PRIMARY KEY(writer_id), 
+	FOREIGN KEY(writer_id) REFERENCES anime(writer_id)
 );
 create table director(
 	director_id int(6), name varchar(20), 
-	PRIMARY KEY(director_id)
+	PRIMARY KEY(director_id), 
+	FOREIGN KEY(director_id) REFERENCES anime(director_id)
 );
 create table openingsong(
 	op_id int(6), name varchar(20), songer_id int(6), 
-	PRIMARY KEY(op_id)
+	PRIMARY KEY(op_id), 
+	FOREIGN KEY(op_id) REFERENCES anime(op_id)
 );
 create table endingsong(
 	ed_id int(6), name varchar(20), songer_id int(6), 
-	PRIMARY KEY(ed_id)
+	PRIMARY KEY(ed_id), 
+	FOREIGN KEY(ed_id) REFERENCES anime(ed_id)
 );
 create table songer(
 	songer_id int(6), name varchar(20), 
@@ -49,11 +57,13 @@ create table songer(
 );
 create table broadcaster(
 	broadcaster_id int(6), name varchar(20), 
-	PRIMARY KEY(broadcaster_id)
+	PRIMARY KEY(broadcaster_id), 
+	FOREIGN KEY(broadcaster_id) REFERENCES anime(broadcaster_id)
 );
 create table broadcast_time(
 	anime_id int(6), broadcaster_id int(6), time varchar(20), 
-	PRIMARY KEY(anime_id, broadcaster_id)
+	PRIMARY KEY(anime_id, broadcaster_id), 
+	FOREIGN KEY(anime_id) REFERENCES anime(anime_id)
 );
 create table users(
 	uid int(10), user_name varchar(10), pass_hash varchar(20), 
@@ -61,7 +71,7 @@ create table users(
 );
 create table userreview(
 	uid int(10), anime_id int(6), tokuten int(3), 
-	tourokubi int, hitokoto varchar(200), 
+	tourokubi unsigned, hitokoto varchar(200), 
 	PRIMARY KEY(anime_id, uid)
 );
 create table userhighlight(
