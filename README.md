@@ -58,8 +58,9 @@ https://akiba-souken.com/anime/[spring|summer|autumn|winter]/ からスクレイ
 - tweet.py における onairs_time_check 関数の最適化
 
 - データベースで管理: MariaDB
-	- データベースに "ID, タイトル, 放送時間, 更新時間" を書き込む
+	- 完: データベースに "ID, タイトル, 放送時間, 更新時間" を書き込む
 		- 制作会社とか声優と書ければなおよい
+	- インデックスを張る等の最適化処理
 
 - HTML 出力: Django
 	- 独自フォーマットで作り直す
@@ -78,6 +79,7 @@ https://akiba-souken.com/anime/[spring|summer|autumn|winter]/ からスクレイ
 # MEMO
 
 - settings.py は別売り
+	- 中身は以下
 
 ```python:settings.py
 CONSUMER_KEY = hoge
@@ -99,5 +101,5 @@ CONNECTION = MySQLdb.connect(
 - anime_db.sql の使い方
 
 ```bash
-mysql -p -u (DBユーザ名) (DB名) < anime_db.sql
+$ mysql -p -u (DBユーザ名) (DB名) < anime_db.sql
 ```
