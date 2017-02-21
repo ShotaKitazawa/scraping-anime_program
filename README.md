@@ -60,6 +60,7 @@ https://akiba-souken.com/anime/[spring|summer|autumn|winter]/ からスクレイ
 - データベースで管理: MariaDB
 	- 完: データベースに "ID, タイトル, 放送時間, 更新時間" を書き込む
 		- 制作会社とか声優と書ければなおよい
+	- insertdb.py の実装
 	- インデックスを張る等の最適化処理
 
 - HTML 出力: Django

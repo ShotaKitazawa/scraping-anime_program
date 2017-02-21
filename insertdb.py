@@ -47,12 +47,22 @@ def scrape_and_insert_db(url, season):
             title = contents[i].find("div", {"class": "mTitle"}).find("a").text
         except AttributeError:
             title = contents[i].find("div", {"class": "mTitle"}).find("h2").text
+        about = contents[i].find("p", {"class": "leadText"}).text
         onairs = contents[i].find("div", {"class": "schedule"}).find("table").find_all("td")
-        onairs_time = onairs_time_check(onairs)
+        onairs_times = onairs_time_check(onairs)
+        try:
+            official_site = contents[i].find("a", {"class": "officialSite"})['href']
+        except AttributeError:
+            official_site = "_"
+        try:
+            official_twitter= contents[i].find("a", {"class": "officialTwitter"})['href']
+        except AttributeError:
+            official_twitter= "_"
+
 
 
 def onairs_time_check(onairs):
-    onairs_time = []
+    onairs_times = []
     for i in range(len(onairs)):
         station_html = onairs[i].find("span", {"class": "station"})
         if station_html is not None:
@@ -60,9 +70,9 @@ def onairs_time_check(onairs):
                 if station_html.text == j:
                     onair_time_first = onairs[i].find_all("span")[1].text
                     onair_time_weekly = re.sub(r"^.*\(([月|火|水|木|金|土|日])\)(.*)$", r"\1曜 \2", onair_time_first)
-                    onairs_time.append(station_html.text + ": " + onair_time_weekly)
+                    onairs_times.append(station_html.text + ": " + onair_time_weekly)
                     break
-    return onairs_time
+    return onairs_times
 
 
 def season_to_i(season):
