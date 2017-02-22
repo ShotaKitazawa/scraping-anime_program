@@ -8,6 +8,8 @@ import settings
 import broadcaster
 
 YEARS = datetime.date.today().year
+con = settings.CONNECTION
+c = con.cursor()
 
 
 def main():
@@ -39,10 +41,7 @@ def scrape_and_insert_db(url, season):
     html = response.text.encode(response.encoding, "ignore")
     soup = BeautifulSoup(html, "lxml")
     contents = soup.find_all("div", {"class": "itemBox"})
-    # for i in range(len(contents)):
-    for i in range(17):
-        # アニメid、 タイトル、あらすじ、会社id、会社名、声優id、声優名、原作者id、原作者名、監督id、監督名、オープニングid、エンディングid、歌手id、歌手名、公式サイトurl、公式ツイッターurl を取ってくる。
-        # TODO: id をどう定義するか
+    for i in range(len(contents)):
         anime_id = int(years_num + season_num + str(i).zfill(3))
         try:
             title = contents[i].find("div", {"class": "mTitle"}).find("a").text
@@ -62,9 +61,8 @@ def scrape_and_insert_db(url, season):
             actor = "_"
         try:
             staff = contents[i].find("dd", {"class": "staff"}).text.replace('\n', '')
-            staff = "_"
+            # MEMO: 制作会社 は要素の最後にある前提
             brand = re.sub(r"^.*制作会社：(.*)$", r"\1", staff)
-            # もし brand テーブルに brand変数 がない場合、brand テーブルに insert #
             if staff.count("原作："):
                 # MEMO: 原作 は要素 0 番目にある前提
                 writer = staff.split("、")[0].replace("原作：", "")
@@ -72,11 +70,17 @@ def scrape_and_insert_db(url, season):
                     writer = re.sub(r"^(.*)\(.*$", r"\1", writer)
             else:
                 writer = "_"
-            # もし writer テーブルに writer変数 がない場合、writer テーブルに insert #
+            if re.match("^監督", staff):
+                director = re.sub(r"^監督(|・.*?)：(.*?)、.*$", r"\2", staff)
+            elif staff.count("、監督"):
+                director = re.sub(r"^.*、監督(|・.*?)：(.*?)、.*$", r"\2", staff)
+            else:
+                director = "_"
         except:
             staff = "_"
             brand = "_"
             writer = "_"
+            director = "_"
         try:
             music = contents[i].find("dl", {"class": "music"}).find("dd").text.replace("\n", "").replace("\r", "")
             if music.count("【OP】") and music.count("【ED】"):
@@ -126,6 +130,8 @@ def scrape_and_insert_db(url, season):
             official_twitter = contents[i].find("a", {"class": "officialTwitter"})['href']
         except:
             official_twitter = "_"
+        # anime テーブルに insert #
+        c.execute('insert into anime values ({0},"{1}","{2}","{3}","{4}","{5}","{6}","{7}","{8}","{9}");'.format(anime_id, escaping(title), escaping(about), escaping(brand), escaping(writer), escaping(director), escaping(op_title), escaping(ed_title), escaping(official_site), escaping(official_twitter)))
 
 
 def onairs_time_check(onairs):
@@ -152,6 +158,13 @@ def season_to_i(season):
     elif season == "winter":
         return "4"
     return "0"
+
+
+def escaping(name):
+    escape_list = ['"']
+    for i in escape_list:
+        name = name.replace(i, " ")
+    return name
 
 
 if __name__ == "__main__":

@@ -1,5 +1,6 @@
 drop table if exists anime;
 drop table if exists brand;
+drop table if exists anime_actor;
 drop table if exists actor;
 drop table if exists originwriter;
 drop table if exists director;
@@ -13,50 +14,38 @@ drop table if exists userreview;
 drop table if exists userhighlight;
 
 create table anime(
-	anime_id int, title varchar(40), about varchar(500), 
-	brand_id int, writer_id int, 
-	director_id int, op_id int, ed_id int, 
-	official_page varchar(2083), official_twitter varchar(2083), 
+	anime_id int, title varchar(32), about varchar(512), 
+	brand varchar(32), writer varchar(32), 
+	director varchar(32), op varchar(32), ed varchar(32), 
+	official_site varchar(2083), official_twitter varchar(2083), 
 	PRIMARY KEY(anime_id)
-);
-create table brand(
-	brand_id int AUTO_INCREMENT, name varchar(20), 
-	PRIMARY KEY(brand_id)
 );
 create table anime_actor(
 	anime_id int, actor_id int,
 	PRIMARY KEY(anime_id, actor_id)
 );
 create table actor(
-	actor_id int AUTO_INCREMENT, name varchar(20), 
+	actor_id int AUTO_INCREMENT, name varchar(32), 
 	PRIMARY KEY(actor_id)
 ); 
-create table originwriter(
-	writer_id int AUTO_INCREMENT, name varchar(20), 
-	PRIMARY KEY(writer_id)
-);
-create table director(
-	director_id int AUTO_INCREMENT, name varchar(20), 
-	PRIMARY KEY(director_id)
-);
 create table openingsong(
-	op_id int AUTO_INCREMENT, name varchar(20), singer_id int, 
-	PRIMARY KEY(op_id)
+	op varchar(32), singer_id int, 
+	PRIMARY KEY(op)
 );
 create table endingsong(
-	ed_id int AUTO_INCREMENT, name varchar(20), singer_id int, 
-	PRIMARY KEY(ed_id)
+	ed varchar(32), singer_id int, 
+	PRIMARY KEY(ed)
 );
 create table singer(
-	singer_id int AUTO_INCREMENT, name varchar(20), 
+	singer_id int AUTO_INCREMENT, name varchar(32), 
 	PRIMARY KEY(singer_id)
 );
 create table broadcaster(
-	broadcaster_id int, name varchar(20), 
+	broadcaster_id int, name varchar(32), 
 	PRIMARY KEY(broadcaster_id)
 );
 create table broadcast_time(
-	anime_id int, broadcaster_id int, dayofweek varchar(20), time varchar(20), 
+	anime_id int, broadcaster_id int, dayofweek varchar(4), time varchar(16), 
 	PRIMARY KEY(anime_id, broadcaster_id)
 );
 create table users(
