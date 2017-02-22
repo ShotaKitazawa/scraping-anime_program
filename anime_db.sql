@@ -29,15 +29,15 @@ create table actor(
 	PRIMARY KEY(actor_id)
 ); 
 create table openingsong(
-	op varchar(32), singer_id int, 
+	op varchar(64), singer_id int, 
 	PRIMARY KEY(op)
 );
 create table endingsong(
-	ed varchar(32), singer_id int, 
+	ed varchar(64), singer_id int, 
 	PRIMARY KEY(ed)
 );
 create table singer(
-	singer_id int AUTO_INCREMENT, name varchar(32), 
+	singer_id int AUTO_INCREMENT, name varchar(512), 
 	PRIMARY KEY(singer_id)
 );
 create table broadcaster(

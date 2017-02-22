@@ -8,6 +8,8 @@ import settings
 import broadcaster
 
 YEARS = datetime.date.today().year
+con = settings.CONNECTION
+c = con.cursor()
 
 
 def main():
@@ -30,8 +32,6 @@ def main():
 
 
 def scrape_and_insert_db(url, season):
-    con = settings.CONNECTION
-    c = con.cursor()
     years_num = str("{0:02d}".format(YEARS % 100))
     season_num = season_to_i(season)
     response = requests.get(url)
@@ -57,15 +57,12 @@ def scrape_and_insert_db(url, season):
                 actor = j.text
                 # もし actor テーブルに actor変数 がない場合、actor テーブルに insert #
                 # anime_actor テーブルに insert #
-                c.execute('select name from actor;')
-                for k in c.fetchall():
-                    if k[0] == actor:
-                        break
-                else:
+                c.execute('select actor_id from actor where name = "{0}";'.format(actor))
+                if len(c.fetchall()) == 0:
                     c.execute('insert into actor(name) values ("{0}");'.format(actor))
-                c.execute('select actor_id from actor where name = "{0}"'.format(actor))
-                actor_id = c.fetchall()[0]
-                c.execute('insert into anime_actor values({0},{1})'.format(anime_id, actor_id))
+                c.execute('select actor_id from actor where name = "{0}";'.format(actor))
+                actor_id = c.fetchall()[0][0]
+                c.execute('insert into anime_actor values({0},{1});'.format(anime_id, actor_id))
         except:
             actor = "_"
         try:
@@ -99,31 +96,39 @@ def scrape_and_insert_db(url, season):
                 op_singer = re.sub(r"^(.*)「(.*)」$", r"\1", op)
                 ed_title = re.sub(r"^(.*)「(.*)」$", r"\2", ed)
                 ed_singer = re.sub(r"^(.*)「(.*)」$", r"\1", ed)
-                # もし singer テーブルに op_singer変数 がない場合、singer テーブルに insert #
-                # もし singer テーブルに ed_singer変数 がない場合、singer テーブルに insert #
-                # openingsong テーブルに insert #
-                # endingsong テーブルに insert #
             elif music.count("【OP】"):
                 op = re.sub(r"^【OP】(.*)$", r"\1", music)
                 ed = "_"
                 op_title = re.sub(r"^(.*)「(.*)」$", r"\2", op)
                 op_singer = re.sub(r"^(.*)「(.*)」$", r"\1", op)
-                # もし singer テーブルに op_singer変数 がない場合、singer テーブルに insert #
-                # openingsong テーブルに insert #
             elif music.count("【ED】"):
                 op = "_"
                 ed = re.sub(r"^【ED】(.*)$", r"\1", music)
                 ed_title = re.sub(r"^(.*)「(.*)」$", r"\2", ed)
                 ed_singer = re.sub(r"^(.*)「(.*)」$", r"\1", ed)
-                # もし singer テーブルに ed_singer変数 がない場合、singer テーブルに insert #
-                # endingsong テーブルに insert #
             else:
                 op = music
                 ed = "_"
                 op_title = re.sub(r"^(.*)「(.*)」$", r"\2", op)
                 op_singer = re.sub(r"^(.*)「(.*)」$", r"\1", op)
-                # もし singer テーブルに op_singer変数 がない場合、singer テーブルに insert #
-                # openingsong テーブルに insert #
+            if not op == "_":
+                c.execute('select singer_id from singer where name = "{0}";'.format(op_singer))
+                if len(c.fetchall()) == 0:
+                    c.execute('insert into singer(name) values ("{0}");'.format(op_singer))
+                c.execute('select singer_id from singer where name = "{0}";'.format(op_singer))
+                singer_id = c.fetchall()[0][0]
+                c.execute('select singer_id from openingsong where op = "{0}";'.format(op_title))
+                if len(c.fetchall()) == 0:
+                    c.execute('insert into openingsong values ("{0}", {1});'.format(op_title, singer_id))
+            if not ed == "_":
+                c.execute('select singer_id from singer where name = "{0}";'.format(ed_singer))
+                if len(c.fetchall()) == 0:
+                    c.execute('insert into singer(name) values ("{0}");'.format(ed_singer))
+                c.execute('select singer_id from singer where name = "{0}";'.format(ed_singer))
+                singer_id = c.fetchall()[0][0]
+                c.execute('select singer_id from endingsong where ed = "{0}";'.format(ed_title))
+                if len(c.fetchall()) == 0:
+                    c.execute('insert into endingsong values ("{0}", {1});'.format(ed_title, singer_id))
         except:
             music = "_"
         onairs = contents[i].find("div", {"class": "schedule"}).find("table").find_all("td")
@@ -140,7 +145,9 @@ def scrape_and_insert_db(url, season):
         except:
             official_twitter = "_"
         # anime テーブルに insert #
-        c.execute('insert into anime values ({0},"{1}","{2}","{3}","{4}","{5}","{6}","{7}","{8}","{9}");'.format(anime_id, escaping(title), escaping(about), escaping(brand), escaping(writer), escaping(director), escaping(op_title), escaping(ed_title), escaping(official_site), escaping(official_twitter)))
+        c.execute('select * from anime where anime_id = {0};'.format(anime_id))
+        if len(c.fetchall()) == 0:
+            c.execute('insert into anime values ({0},"{1}","{2}","{3}","{4}","{5}","{6}","{7}","{8}","{9}");'.format(anime_id, escaping(title), escaping(about), escaping(brand), escaping(writer), escaping(director), escaping(op_title), escaping(ed_title), escaping(official_site), escaping(official_twitter)))
 
     con.commit()
     c.close()
@@ -163,6 +170,7 @@ def onairs_time_check(onairs):
 
 
 def season_to_i(season):
+
     if season == "spring":
         return "1"
     elif season == "summer":
@@ -175,7 +183,7 @@ def season_to_i(season):
 
 
 def escaping(name):
-    escape_list = ['"']
+    escape_list = ['"', '\'']
     for i in escape_list:
         name = name.replace(i, " ")
     return name
