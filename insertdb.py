@@ -8,8 +8,6 @@ import settings
 import broadcaster
 
 YEARS = datetime.date.today().year
-con = settings.CONNECTION
-c = con.cursor()
 
 
 def main():
@@ -32,6 +30,8 @@ def main():
 
 
 def scrape_and_insert_db(url, season):
+    con = settings.CONNECTION
+    c = con.cursor()
     years_num = str("{0:02d}".format(YEARS % 100))
     season_num = season_to_i(season)
     response = requests.get(url)
@@ -57,6 +57,15 @@ def scrape_and_insert_db(url, season):
                 actor = j.text
                 # もし actor テーブルに actor変数 がない場合、actor テーブルに insert #
                 # anime_actor テーブルに insert #
+                c.execute('select name from actor;')
+                for k in c.fetchall():
+                    if k[0] == actor:
+                        break
+                else:
+                    c.execute('insert into actor(name) values ("{0}");'.format(actor))
+                c.execute('select actor_id from actor where name = "{0}"'.format(actor))
+                actor_id = c.fetchall()[0]
+                c.execute('insert into anime_actor values({0},{1})'.format(anime_id, actor_id))
         except:
             actor = "_"
         try:
@@ -132,6 +141,11 @@ def scrape_and_insert_db(url, season):
             official_twitter = "_"
         # anime テーブルに insert #
         c.execute('insert into anime values ({0},"{1}","{2}","{3}","{4}","{5}","{6}","{7}","{8}","{9}");'.format(anime_id, escaping(title), escaping(about), escaping(brand), escaping(writer), escaping(director), escaping(op_title), escaping(ed_title), escaping(official_site), escaping(official_twitter)))
+
+    con.commit()
+    c.close()
+    con.close()
+    sys.exit(0)
 
 
 def onairs_time_check(onairs):

@@ -14,7 +14,7 @@ drop table if exists userreview;
 drop table if exists userhighlight;
 
 create table anime(
-	anime_id int, title varchar(32), about varchar(512), 
+	anime_id int, title varchar(64), about varchar(512), 
 	brand varchar(32), writer varchar(32), 
 	director varchar(32), op varchar(32), ed varchar(32), 
 	official_site varchar(2083), official_twitter varchar(2083), 
