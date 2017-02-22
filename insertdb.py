@@ -55,8 +55,6 @@ def scrape_and_insert_db(url, season):
             actors = contents[i].find("dd").find_all("a")
             for j in actors:
                 actor = j.text
-                # もし actor テーブルに actor変数 がない場合、actor テーブルに insert #
-                # anime_actor テーブルに insert #
                 c.execute('select actor_id from actor where name = "{0}";'.format(actor))
                 if len(c.fetchall()) == 0:
                     c.execute('insert into actor(name) values ("{0}");'.format(actor))
@@ -135,7 +133,13 @@ def scrape_and_insert_db(url, season):
         onairs_times = onairs_time_check(onairs)
         for j in onairs_times:
             onair_time = j
-            # broadcast_time テーブルに insert #
+            onair_time_list = onair_time.split(",")
+            print(j)
+            c.execute('select anime_id from broadcast_time where anime_id = {0};'.format(anime_id))
+            if len(c.fetchall()) == 0:
+                c.execute('select broadcaster_id from broadcaster where name = "{0}";'.format(onair_time_list[0]))
+                broadcaster_id = c.fetchall()[0][0]
+                c.execute('insert into broadcast_time values ({0}, {1}, "{2}", "{3}");'.format(anime_id, broadcaster_id, onair_time_list[1], onair_time_list[2]))
         try:
             official_site = contents[i].find("a", {"class": "officialSite"})['href']
         except:
@@ -144,7 +148,6 @@ def scrape_and_insert_db(url, season):
             official_twitter = contents[i].find("a", {"class": "officialTwitter"})['href']
         except:
             official_twitter = "_"
-        # anime テーブルに insert #
         c.execute('select * from anime where anime_id = {0};'.format(anime_id))
         if len(c.fetchall()) == 0:
             c.execute('insert into anime values ({0},"{1}","{2}","{3}","{4}","{5}","{6}","{7}","{8}","{9}");'.format(anime_id, escaping(title), escaping(about), escaping(brand), escaping(writer), escaping(director), escaping(op_title), escaping(ed_title), escaping(official_site), escaping(official_twitter)))
@@ -163,8 +166,12 @@ def onairs_time_check(onairs):
             for j in broadcaster.broadcaster_list:
                 if station_html.text == j:
                     onair_time_first = onairs[i].find_all("span")[1].text
-                    onair_time_weekly = re.sub(r"^.*\(([月|火|水|木|金|土|日])\)(.*)$", r"\1曜 \2", onair_time_first)
-                    onairs_times.append(station_html.text + ": " + onair_time_weekly)
+                    onair_time_weekly = re.sub(r"^.*\(([月|火|水|木|金|土|日])\)(.*)$", r"\1,\2", onair_time_first)
+                    if onair_time_weekly.count("レギュラー放送"):
+                        onair_time_weekly = re.sub(r"^([月|火|水|木|金|土|日]).*レギュラー放送時間(.*)\)$", r"\1,\2", onair_time_weekly)
+                    if onair_time_weekly.count("※"):
+                        onair_time_weekly = re.sub(r"^(.*)　.*$", r"\1", onair_time_weekly)
+                    onairs_times.append(station_html.text + "," + onair_time_weekly)
                     break
     return onairs_times
 
