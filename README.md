@@ -12,6 +12,14 @@ https://akiba-souken.com/anime/[spring|summer|autumn|winter]/ からスクレイ
 	- mysqlclient (1.3.10)
 - MariaDB 10.1.21
 
+# Stracture
+
+- anime_db.sql: MariaDBセットアップ用のsql文です。
+- broadcaster.py: 対象放送局を設定します。
+- settings.py: Twitterアクセストークン、MariaDB接続情報 を格納します。
+- insertdb.py: MariaDB に情報をinsertします。
+- tweet.py: 引数の季節に放送する番組についてツイートを行います。
+
 # Problem
 
 - [しょぼいカレンダー](http://cal.syoboi.jp/) との差別化
