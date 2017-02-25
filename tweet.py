@@ -51,7 +51,7 @@ def scrape_and_tweet(url, season):
         title_escaped = escaping(title)
         image_url = contents[i].find("div", {"class": "itemImg"}).find("img")['src']
         onairs = contents[i].find("div", {"class": "schedule"}).find("table").find_all("td")
-        onairs_times = onairs_time_check(onairs)
+        onairs_time = onairs_time_check(onairs)
 
         if image_exist(title_escaped, season):
             sys.stdout.write("{0} image have already existed.\n".format(title))
@@ -59,10 +59,10 @@ def scrape_and_tweet(url, season):
             download_image(image_url, title_escaped, season)
 
         tweet = str(YEARS) + "年" + japanese(season) + "\n\n" + title + "\n\n"
-        if len(onairs_times) == 0:
+        if len(onairs_time) == 0:
             tweet += "Not OnAir"
         else:
-            for i in onairs_times:
+            for i in onairs_time:
                 tweet += i
                 tweet += "\n"
         api.update_with_media(filename="{0}/.images/{1}-{2}/{3}.jpg".format(os.path.expanduser('~'), YEARS, season, title_escaped), status=tweet)
@@ -84,7 +84,7 @@ def escaping(title):
 
 
 def onairs_time_check(onairs):
-    onairs_times = []
+    onairs_time = []
     for i in range(len(onairs)):
         station_html = onairs[i].find("span", {"class": "station"})
         if station_html is not None:
@@ -92,9 +92,9 @@ def onairs_time_check(onairs):
                 if station_html.text == j:
                     onair_time_first = onairs[i].find_all("span")[1].text
                     onair_time_weekly = re.sub(r"^.*\(([月|火|水|木|金|土|日])\)(.*)$", r"\1曜 \2", onair_time_first)
-                    onairs_times.append(station_html.text + ": " + onair_time_weekly)
+                    onairs_time.append(station_html.text + ": " + onair_time_weekly)
                     break
-    return onairs_times
+    return onairs_time
 
 
 def image_exist(title, season):
@@ -120,7 +120,7 @@ def japanese(season):
         return "秋"
     elif season == "winter":
         return "冬"
-    return "_"
+    return "N/A"
 
 
 if __name__ == "__main__":

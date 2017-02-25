@@ -46,7 +46,7 @@ https://akiba-souken.com/anime/[spring|summer|autumn|winter]/ からスクレイ
 
 - 完: 既に jpg がある場合は、ダウンロードしない
 
-- スタッフ・制作会社をスクレイピング
+- 完: スタッフ・制作会社をスクレイピング
 
 - 番組表を元に色々やる
 	- しょぼいカレンダーからとってくる？
@@ -68,7 +68,8 @@ https://akiba-souken.com/anime/[spring|summer|autumn|winter]/ からスクレイ
 - データベースで管理: MariaDB
 	- 完: データベースに "ID, タイトル, 放送時間, 更新時間" を書き込む
 		- 制作会社とか声優と書ければなおよい
-	- insertdb.py の実装
+	- 完: insertdb.py の実装
+		- 実行することで、データベースにデータをインサートする。
 	- インデックスを張る等の最適化処理
 
 - HTML 出力: Django
