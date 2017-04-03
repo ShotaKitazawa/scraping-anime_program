@@ -1,3 +1,5 @@
+**Do not maintain any more**
+
 # About
 
 https://akiba-souken.com/anime/[spring|summer|autumn|winter]/ からスクレイピングします。
